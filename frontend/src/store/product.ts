@@ -4,22 +4,40 @@ type Product = {
   name: string;
   price: string;
   image: string;
+  _id: string;
 };
 
 type ProductsState = {
   products: Product[];
   setProducts: (products: Product[]) => void;
+  fetchProducts: () => Promise<void>;
   createProduct: (
     newProduct: Product
   ) => Promise<{ success: boolean; message: string }>;
+  updateProduct: (
+    productId: string,
+    updatedProduct: Product
+  ) => Promise<{
+    success: boolean;
+    message: string;
+  }>;
+  deleteProduct: (productId: string) => Promise<{
+    success: boolean;
+    message: string;
+  }>;
 };
 
 export const useProductStore = create<ProductsState>((set) => ({
   products: [],
   setProducts: (products: Product[]) => set({ products }),
+  fetchProducts: async () => {
+    const res = await fetch("/api/products");
+    const data = await res.json();
+    set({ products: data.data });
+  },
   createProduct: async (newProduct: Product) => {
     if (!newProduct.name || !newProduct.price || !newProduct.image) {
-      return { success: false, message: "please fill all fields ..." };
+      return { success: false, message: "Please fill all fields ..." };
     }
     const res = await fetch("/api/products", {
       method: "POST",
@@ -33,5 +51,44 @@ export const useProductStore = create<ProductsState>((set) => ({
       products: [...state.products, data.data],
     }));
     return { success: true, message: "Product created successfully" };
+  },
+  deleteProduct: async (productId: string) => {
+    const res = await fetch(`/api/products/${productId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.success) {
+      set((state) => ({
+        products: state.products.filter((product) => product._id !== productId),
+      }));
+      return { success: true, message: data.message };
+    }
+    return { success: false, message: "Failed to delete product" };
+  },
+  updateProduct: async (productId: string, updatedProduct: Product) => {
+    if (
+      !updatedProduct.name ||
+      !updatedProduct.price ||
+      !updatedProduct.image
+    ) {
+      return { success: false, message: "Please fill all fields ..." };
+    }
+    const res = await fetch(`/api/products/${productId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedProduct),
+    });
+    const data = await res.json();
+    if (data.success) {
+      set((state) => ({
+        products: state.products.map((product) =>
+          product._id === productId ? updatedProduct : product
+        ),
+      }));
+      return { success: true, message: data.message };
+    }
+    return { success: false, message: "Failed to update product" };
   },
 }));

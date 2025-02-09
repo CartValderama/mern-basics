@@ -16,6 +16,7 @@ const CreatePage = () => {
     name: "",
     price: "",
     image: "",
+    _id: "",
   });
 
   const { createProduct } = useProductStore((state) => state);
