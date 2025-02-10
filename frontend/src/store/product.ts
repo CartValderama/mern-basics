@@ -1,33 +1,30 @@
 import { create } from "zustand";
 
-type Product = {
+// Define types for Product and the state
+export type Product = {
+  _id: string;
   name: string;
   price: string;
   image: string;
-  _id: string;
 };
 
-type ProductsState = {
+interface ProductState {
   products: Product[];
   setProducts: (products: Product[]) => void;
   fetchProducts: () => Promise<void>;
   createProduct: (
     newProduct: Product
   ) => Promise<{ success: boolean; message: string }>;
+  deleteProduct: (
+    productId: string
+  ) => Promise<{ success: boolean; message: string }>;
   updateProduct: (
     productId: string,
     updatedProduct: Product
-  ) => Promise<{
-    success: boolean;
-    message: string;
-  }>;
-  deleteProduct: (productId: string) => Promise<{
-    success: boolean;
-    message: string;
-  }>;
-};
+  ) => Promise<{ success: boolean; message: string }>;
+}
 
-export const useProductStore = create<ProductsState>((set) => ({
+export const useProductStore = create<ProductState>((set) => ({
   products: [],
   setProducts: (products: Product[]) => set({ products }),
   fetchProducts: async () => {

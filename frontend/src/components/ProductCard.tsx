@@ -21,13 +21,7 @@ import { useColorModeValue } from "./ui/color-mode";
 import { useProductStore } from "@/store/product";
 import { toaster, Toaster } from "./ui/toaster";
 import { useState } from "react";
-
-type Product = {
-  name: string;
-  price: string;
-  image: string;
-  _id: string;
-};
+import { Product } from "@/store/product";
 
 type ProductCardProps = {
   product: Product;

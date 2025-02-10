@@ -12,22 +12,35 @@ export const getProducts = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-  const product = req.body;
+  let product = req.body;
 
-  if (!product.name || !product.price || !product.image) {
+  // Create a new object with only the properties we want (excluding _id)
+  const { name, price, image } = product;
+  const newProductData = { name, price, image };
+
+  console.log("Received product (without _id):", newProductData);
+
+  // Validation check
+  if (!newProductData.name || !newProductData.price || !newProductData.image) {
     return res
       .status(400)
       .json({ success: false, message: "Please provide all fields" });
   }
 
-  const newProduct = new Product(product);
+  // Create a new product instance using the new object
+  const newProduct = new Product(newProductData);
+  console.log("New product (before save):", newProduct);
 
   try {
+    // Save the product to the database
     await newProduct.save();
     res.status(201).json({ success: true, data: newProduct });
   } catch (error) {
-    console.error("Error in Create product", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error("Error in Create product:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server Error when creating product",
+    });
   }
 };
 

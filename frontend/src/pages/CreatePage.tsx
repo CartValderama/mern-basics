@@ -27,7 +27,6 @@ const CreatePage = () => {
       ...newProduct,
       _id: "",
     });
-
     if (!success) {
       toaster.create({
         title: "error",
