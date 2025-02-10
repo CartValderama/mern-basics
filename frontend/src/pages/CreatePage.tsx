@@ -10,19 +10,23 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { Toaster, toaster } from "@/components/ui/toaster";
+import { useNavigate } from "react-router-dom";
 
 const CreatePage = () => {
+  const navigate = useNavigate();
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
     image: "",
-    _id: "",
   });
 
   const { createProduct } = useProductStore((state) => state);
 
   const handleAddProduct = async () => {
-    const { success, message } = await createProduct(newProduct);
+    const { success, message } = await createProduct({
+      ...newProduct,
+      _id: "",
+    });
 
     if (!success) {
       toaster.create({
@@ -37,6 +41,8 @@ const CreatePage = () => {
         type: "success",
       });
     }
+
+    navigate("/");
   };
 
   return (
